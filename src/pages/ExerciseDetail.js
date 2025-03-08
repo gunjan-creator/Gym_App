@@ -1,12 +1,13 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box } from '@mui/material';
+import { CircularProgress, Typography } from "@mui/material";
 
 import { exerciseOptions, fetchData,youtubeOptions } from '../utils/fetchData';
-import Detail from '../Components/Detail';
-import ExerciseVideos from '../Components/ExerciseVideos';
-import SimilarExercises from '../Components/SimilarExercises';
+const Detail = lazy(() => import("../Components/Detail"));
+const ExerciseVideos = lazy(() => import("../Components/ExerciseVideos"));
+const SimilarExercises = lazy(() => import("../Components/SimilarExercises"));
 
 const ExerciseDetail = () => {
   const [exerciseDetail, setExerciseDetail] = useState({});
@@ -42,9 +43,17 @@ const ExerciseDetail = () => {
 
   return (
     <Box sx={{ mt: { lg: '96px', xs: '60px' } }}>
-      <Detail exerciseDetail={exerciseDetail} />
-      <ExerciseVideos exerciseVideos={exerciseVideos} name={exerciseDetail.name} />
-      <SimilarExercises targetMuscleExercises={targetMuscleExercises} equipmentExercises={equipmentExercises} />
+    <Suspense fallback={<CircularProgress />}>
+  <Detail exerciseDetail={exerciseDetail} />
+</Suspense>
+
+<Suspense fallback={<Typography>Loading Videos...</Typography>}>
+  <ExerciseVideos exerciseVideos={exerciseVideos} name={exerciseDetail.name} />
+</Suspense>
+
+<Suspense fallback={<Typography>Loading Similar Exercises...</Typography>}>
+  <SimilarExercises targetMuscleExercises={targetMuscleExercises} equipmentExercises={equipmentExercises} />
+</Suspense>
     </Box>
   );
 };

@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, lazy, Suspense } from "react";
 import Pagination from "@mui/material/Pagination";
 import { Box, Stack, Typography } from "@mui/material";
-import ExerciseCard from "./ExerciseCard";
 import { exerciseOptions, fetchData } from "../utils/fetchData";
+
+const ExerciseCard = lazy(() => import("./ExerciseCard"));
+
 
 const Exercises = ({ exercises, setExercises, bodyPart }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [exercisesPerPage] = useState(7);
   const indexOfLastExercise = currentPage * exercisesPerPage;
   const indexOfFirstExercise = indexOfLastExercise - exercisesPerPage;
-  const currentExercises = exercises.slice(indexOfFirstExercise, indexOfLastExercise);
+  const currentExercises = useMemo(() => {
+    return exercises.slice(indexOfFirstExercise, indexOfLastExercise);
+  }, [exercises, currentPage]); 
   const paginate = (event, value) => {
     setCurrentPage(value);
 
@@ -48,9 +52,11 @@ const Exercises = ({ exercises, setExercises, bodyPart }) => {
         flexWrap="wrap"
         justifyContent="center"
       >
-        {currentExercises.map((exercise, idx) => (
-        <ExerciseCard key={idx} exercise={exercise}/>
-        ))}
+       <Suspense fallback={<Typography>Loading exercises...</Typography>}>
+  {currentExercises.map((exercise, idx) => (
+    <ExerciseCard key={idx} exercise={exercise} />
+  ))}
+</Suspense>
       </Stack>
       <Stack sx={{ mt: { lg: '114px', xs: '70px' } }} alignItems="center">
         {exercises.length > 9 && (
