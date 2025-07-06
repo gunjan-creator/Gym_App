@@ -1,3 +1,7 @@
+# Gym_App
+
+I have Created a GYM App Project
+
 # Fitness Exercise App 💪
 
 This is a React-based fitness application that allows users to explore over **1000+ exercises** with practical examples, exercise details, and related YouTube videos. The app is built using **Material UI** and integrates with the **ExerciseDB API** to fetch exercise data.
@@ -27,30 +31,6 @@ This is a React-based fitness application that allows users to explore over **10
 ## 📦 Installation & Setup
 
 **1️⃣ Clone the repository:**
-   ```
+   ```bash
    git clone https://github.com/gunjan-creator/gym_app.git
    cd fitness-exercise-app
-   ```
-
-**2️⃣ Install dependencies:**
-
-   ```
-   npm install
-   ```
-
-**3️⃣ Set up your environment variables:**
-
-```
-REACT_APP_RAPID_KEY=your_rapidapi_key_here
-```
-
-**4️⃣ Run the application:**
-
-   ```
-   npm start
-   ```
-   
-**5️⃣ Open in your browser:**
-   ```
-   http://localhost:3000
-   ```
