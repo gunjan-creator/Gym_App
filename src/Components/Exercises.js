@@ -5,37 +5,55 @@ import { exerciseOptions, fetchData } from "../utils/fetchData";
 
 const ExerciseCard = lazy(() => import("./ExerciseCard"));
 
-
 const Exercises = ({ exercises, setExercises, bodyPart }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [exercisesPerPage] = useState(7);
+
   const indexOfLastExercise = currentPage * exercisesPerPage;
   const indexOfFirstExercise = indexOfLastExercise - exercisesPerPage;
+
   const currentExercises = useMemo(() => {
+    if (!Array.isArray(exercises)) return []; // ✅ guard against crash
     return exercises.slice(indexOfFirstExercise, indexOfLastExercise);
-  }, [exercises, currentPage]); 
+  }, [exercises, currentPage]);
+
   const paginate = (event, value) => {
     setCurrentPage(value);
-
-    window.scrollTo({ top: 1800, behavior: 'smooth' });
+    window.scrollTo({ top: 1800, behavior: "smooth" });
   };
+
   useEffect(() => {
     const fetchExercisesData = async () => {
       let exercisesData = [];
 
-      if (bodyPart === 'all') {
-        exercisesData = await fetchData('https://exercisedb.p.rapidapi.com/exercises?limit=1327&offset=0', exerciseOptions);
-      } else {
-        exercisesData = await fetchData(`https://exercisedb.p.rapidapi.com/exercises/bodyPart/${bodyPart}`, exerciseOptions);
-      }
+      try {
+        if (bodyPart === "all") {
+          exercisesData = await fetchData(
+            "https://exercisedb.p.rapidapi.com/exercises?limit=1327&offset=0",
+            exerciseOptions
+          );
+        } else {
+          exercisesData = await fetchData(
+            `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${bodyPart}`,
+            exerciseOptions
+          );
+        }
 
-      setExercises(exercisesData);
+        if (Array.isArray(exercisesData)) {
+          setExercises(exercisesData);
+        } else {
+          console.error("Unexpected API response (not an array):", exercisesData);
+          setExercises([]); // fallback
+        }
+      } catch (error) {
+        console.error("Error fetching exercises:", error);
+        setExercises([]); // fallback
+      }
     };
 
     fetchExercisesData();
-  }, [bodyPart]);
+  }, [bodyPart, setExercises]);
 
- 
   return (
     <Box id="exercises" sx={{ mt: { lg: "109px" } }} mt="50px" p="20px">
       <Typography
@@ -46,20 +64,22 @@ const Exercises = ({ exercises, setExercises, bodyPart }) => {
       >
         Showing Results
       </Typography>
+
       <Stack
         direction="row"
         sx={{ gap: { lg: "107px", xs: "50px" } }}
         flexWrap="wrap"
         justifyContent="center"
       >
-       <Suspense fallback={<Typography>Loading exercises...</Typography>}>
-  {currentExercises.map((exercise, idx) => (
-    <ExerciseCard key={idx} exercise={exercise} />
-  ))}
-</Suspense>
+        <Suspense fallback={<Typography>Loading exercises...</Typography>}>
+          {currentExercises.map((exercise, idx) => (
+            <ExerciseCard key={idx} exercise={exercise} />
+          ))}
+        </Suspense>
       </Stack>
-      <Stack sx={{ mt: { lg: '114px', xs: '70px' } }} alignItems="center">
-        {exercises.length > 9 && (
+
+      <Stack sx={{ mt: { lg: "114px", xs: "70px" } }} alignItems="center">
+        {Array.isArray(exercises) && exercises.length > 9 && (
           <Pagination
             color="standard"
             shape="rounded"
@@ -71,7 +91,6 @@ const Exercises = ({ exercises, setExercises, bodyPart }) => {
           />
         )}
       </Stack>
-     
     </Box>
   );
 };
